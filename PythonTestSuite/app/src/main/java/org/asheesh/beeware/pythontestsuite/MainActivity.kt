@@ -1,7 +1,7 @@
 package org.asheesh.beeware.pythontestsuite
 
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import androidx.appcompat.app.AppCompatActivity
 import kotlinx.android.synthetic.main.activity_main.*
 
 class MainActivity : AppCompatActivity() {
@@ -10,15 +10,16 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-    // Example of a call to a native method
-    sample_text.text = stringFromJNI()
+        // Capture stdout/stderr so we can read output from Python.
+        captureStdoutStderr()
+
+        sample_text.text = "Hello from Kotlin!"
     }
 
     /**
-     * A native method that is implemented by the 'native-lib' native library,
-     * which is packaged with this application.
+     * A native method to capture stdio/stderr and copy them to the Android log.
      */
-    external fun stringFromJNI(): String
+    external fun captureStdoutStderr(): Boolean
 
     companion object {
 
