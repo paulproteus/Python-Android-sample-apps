@@ -45,6 +45,31 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
+    private fun unpackRubicon() {
+        // TODO: Avoid unpacking if already unpacked.
+        val destDir = applicationContext.dataDir.absolutePath + "/rubicon-hmm/"
+        val zis = ZipInputStream(assets.open("rubicon.zip"))
+        var zipEntry = zis.nextEntry
+        val buf = ByteArray(1024 * 1024 * 4)
+        while (zipEntry != null) {
+            val outputFile = File(destDir + zipEntry)
+            if (zipEntry.isDirectory) {
+                outputFile.mkdirs()
+                zipEntry = zis.nextEntry
+                continue
+            }
+            val fos = FileOutputStream(outputFile)
+            var len: Int
+            while (zis.read(buf).also { len = it } > 0) {
+                fos.write(buf, 0, len)
+            }
+            fos.close()
+            zipEntry = zis.nextEntry
+        }
+        zis.closeEntry()
+        zis.close()
+    }
+
     private fun setPythonEnvVars() {
         // Unpack Python into cache directory -- use applicationContext.externalCacheDir
         Os.setenv(
@@ -52,6 +77,7 @@ class MainActivity : AppCompatActivity() {
             applicationContext.dataDir!!.absolutePath,
             true
         )
+        Os.setenv("PYTHONPATH", applicationContext.dataDir.absolutePath + "/rubicon-hmm/", true)
         Os.setenv("RUBICON_LIBRARY", applicationInfo.nativeLibraryDir + "/librubicon.so", true)
         Log.v(
             "python home",
@@ -67,6 +93,14 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
+    private fun runPythonString(s: String) {
+        val fullFilename = applicationContext.dataDir!!.absolutePath + "/runme.py"
+        val fos = FileOutputStream(fullFilename)
+        fos.write(s.toByteArray())
+        fos.close()
+        Python.run(fullFilename, arrayOf())
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
@@ -77,6 +111,13 @@ class MainActivity : AppCompatActivity() {
         unpackPython()
         setPythonEnvVars()
         startPython()
+        unpackRubicon()
+        runPythonString(
+            """
+            import cmath
+            print("Hello from Python", cmath.sin(3.14))
+        """.trimIndent()
+        )
 
         sample_text.text = "Hello from Kotlin!"
     }
