@@ -113,9 +113,16 @@ class MainActivity : AppCompatActivity() {
         startPython()
         unpackRubicon()
         runPythonString(
+            // bring test_logging back soon
             """
-            import cmath
-            print("Hello from Python", cmath.sin(3.14))
+            import sys
+            import os
+            import random
+            l = ['test_os']
+            random.shuffle(l)
+            sys.executable = os.environ.get("PYTHONHOME") + "/bin/python3"
+            from test.libregrtest import main
+            main(l, verbose=True)
         """.trimIndent()
         )
 
