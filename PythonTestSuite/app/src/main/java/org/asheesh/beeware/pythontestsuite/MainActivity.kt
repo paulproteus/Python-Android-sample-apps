@@ -14,8 +14,11 @@ import java.util.zip.ZipInputStream
 class MainActivity : AppCompatActivity() {
 
     private fun unpackPython() {
-        // TODO: Avoid unpacking Python if already unpacked.
-        val destDir = applicationContext.dataDir
+        val destDir = applicationContext.dataDir!!
+        val existingLib = File(destDir.absolutePath + "/lib/")
+        if (existingLib.exists()) {
+            existingLib.deleteRecursively()
+        }
         val zis = ZipInputStream(assets.open("pythonhome.zip"))
         var zipEntry = zis.nextEntry
         val buf = ByteArray(1024 * 1024 * 4)
