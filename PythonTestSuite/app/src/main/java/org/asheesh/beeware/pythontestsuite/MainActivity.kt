@@ -1,5 +1,6 @@
 package org.asheesh.beeware.pythontestsuite
 
+import android.os.Build
 import android.os.Bundle
 import android.system.Os
 import android.util.Log
@@ -14,14 +15,15 @@ import java.util.zip.ZipInputStream
 class MainActivity : AppCompatActivity() {
 
     private fun unpackPython() {
+        val myAbi = Build.SUPPORTED_ABIS[0];
         val destDir = applicationContext.dataDir!!
+        val zis = ZipInputStream(assets.open("pythonhome." + myAbi + ".zip"))
         val existingLib = File(destDir.absolutePath + "/lib/")
         if (existingLib.exists()) {
             Log.d("unpackPython", "deleting recursively")
             existingLib.deleteRecursively()
             Log.d("unpackPython", "deleting recursively done")
         }
-        val zis = ZipInputStream(assets.open("pythonhome.zip"))
         var zipEntry = zis.nextEntry
         val buf = ByteArray(1024 * 1024 * 4)
         while (zipEntry != null) {
