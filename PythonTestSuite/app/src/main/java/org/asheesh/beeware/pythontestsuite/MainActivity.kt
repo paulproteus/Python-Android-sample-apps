@@ -17,7 +17,9 @@ class MainActivity : AppCompatActivity() {
         val destDir = applicationContext.dataDir!!
         val existingLib = File(destDir.absolutePath + "/lib/")
         if (existingLib.exists()) {
+            Log.d("unpackPython", "deleting recursively")
             existingLib.deleteRecursively()
+            Log.d("unpackPython", "deleting recursively done")
         }
         val zis = ZipInputStream(assets.open("pythonhome.zip"))
         var zipEntry = zis.nextEntry
@@ -121,11 +123,13 @@ class MainActivity : AppCompatActivity() {
             import sys
             import os
             import random
-            l = ['test_os']
+            l = []
             random.shuffle(l)
             sys.executable = os.environ.get("PYTHONHOME") + "/bin/python3"
             from test.libregrtest import main
-            main(l, verbose=True)
+            import ctypes
+            import sys
+            main(l)
         """.trimIndent()
         )
 
