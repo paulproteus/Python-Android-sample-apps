@@ -9,41 +9,68 @@ import kotlinx.android.synthetic.main.activity_main.*
 import org.beeware.rubicon.Python
 import java.io.File
 import java.io.FileOutputStream
+import java.lang.RuntimeException
 import java.util.zip.ZipInputStream
 
 
 class MainActivity : AppCompatActivity() {
+    private val pythonBasePath: String
+    get()  {
+        return pythonBaseDir.absolutePath
+    }
 
-    private fun unpackPython() {
-        val myAbi = Build.SUPPORTED_ABIS[0];
-        val destDir = applicationContext.dataDir!!
-        val zis = ZipInputStream(assets.open("pythonhome." + myAbi + ".zip"))
-        val existingLib = File(destDir.absolutePath + "/lib/")
-        if (existingLib.exists()) {
+    private val pythonBaseDir: File
+    get() {
+        val dir = File(applicationContext.filesDir!!.absolutePath + "/python/")
+        if (!dir.exists()) {
+            val mkdirResult = dir.mkdirs()
+            if (!mkdirResult) {
+                throw Exception("Unable to find a place to store the Python stdlib.")
+            }
+        }
+        return dir
+    }
+
+    private fun unzipTo(inputStream: ZipInputStream, outputDir: File) {
+        if (outputDir.exists()) {
             Log.d("unpackPython", "deleting recursively")
-            existingLib.deleteRecursively()
+            outputDir.deleteRecursively()
             Log.d("unpackPython", "deleting recursively done")
         }
-        var zipEntry = zis.nextEntry
+        if (!outputDir.mkdirs()) {
+            throw RuntimeException("Unable to mkdir ${outputDir.absolutePath}")
+        }
+        var zipEntry = inputStream.nextEntry
         val buf = ByteArray(1024 * 1024 * 4)
         while (zipEntry != null) {
-            val outputFile = File(destDir.absolutePath + "/" + zipEntry)
+            val outputFile = File("${outputDir.absolutePath}/${zipEntry}")
             if (zipEntry.isDirectory) {
-                outputFile.mkdirs()
-                zipEntry = zis.nextEntry
+                Log.d("unzipTo", "creating dir ${outputFile.absolutePath}")
+                val result = outputFile.mkdirs()
+                if (!result) {
+                    Log.d("unzipTo", "mkdirs result = $result")
+                }
+                zipEntry = inputStream.nextEntry
                 continue
             }
-            val fos = FileOutputStream(outputFile)
+            Log.d("unzipTo", "about to create file ${outputFile.absolutePath}")
+            val fos = FileOutputStream(outputFile.absolutePath)
             var len: Int
-            while (zis.read(buf).also { len = it } > 0) {
+            while (inputStream.read(buf).also { len = it } > 0) {
                 fos.write(buf, 0, len)
             }
             fos.close()
-            zipEntry = zis.nextEntry
+            zipEntry = inputStream.nextEntry
         }
-        zis.closeEntry()
-        zis.close()
-        val python = File(applicationContext.dataDir!!.absolutePath + "/bin/python3")
+        inputStream.closeEntry()
+        inputStream.close()
+    }
+
+    private fun unpackPython() {
+        val myAbi = Build.SUPPORTED_ABIS[0];
+        Log.e("unpackPython", "abi is ${myAbi}")
+        unzipTo(ZipInputStream(assets.open("pythonhome.${myAbi}.zip")), pythonBaseDir)
+        val python = File("${pythonBaseDir}/bin/python3")
         if (python.exists()) {
             python.setExecutable(true)
             python.setReadable(true)
@@ -52,56 +79,33 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
+    private val rubiconBasePath: String
+    get() {
+        return "${pythonBasePath}/rubicon_install/"
+    }
+
     private fun unpackRubicon() {
-        // TODO: Avoid unpacking if already unpacked.
-        val destDir = applicationContext.dataDir.absolutePath + "/rubicon-hmm/"
-        val zis = ZipInputStream(assets.open("rubicon.zip"))
-        var zipEntry = zis.nextEntry
-        val buf = ByteArray(1024 * 1024 * 4)
-        while (zipEntry != null) {
-            val outputFile = File(destDir + zipEntry)
-            if (zipEntry.isDirectory) {
-                outputFile.mkdirs()
-                zipEntry = zis.nextEntry
-                continue
-            }
-            val fos = FileOutputStream(outputFile)
-            var len: Int
-            while (zis.read(buf).also { len = it } > 0) {
-                fos.write(buf, 0, len)
-            }
-            fos.close()
-            zipEntry = zis.nextEntry
-        }
-        zis.closeEntry()
-        zis.close()
+        unzipTo(ZipInputStream(assets.open("rubicon.zip")), File(rubiconBasePath))
     }
 
     private fun setPythonEnvVars() {
-        // Unpack Python into cache directory -- use applicationContext.externalCacheDir
-        Os.setenv(
-            "PYTHONHOME",
-            applicationContext.dataDir!!.absolutePath,
-            true
-        )
-        Os.setenv("PYTHONPATH", applicationContext.dataDir.absolutePath + "/rubicon-hmm/", true)
-        Os.setenv("RUBICON_LIBRARY", applicationInfo.nativeLibraryDir + "/librubicon.so", true)
+        Os.setenv("RUBICON_LIBRARY", "${applicationInfo.nativeLibraryDir}/librubicon.so", true)
         Log.v(
             "python home",
-            applicationContext.dataDir!!.absolutePath
+            pythonBasePath
         )
         Os.setenv("TMPDIR", applicationContext.cacheDir!!.absolutePath, true)
     }
 
     private fun startPython() {
-        val pythonStart = Python.init(null, ".", null)
+        val pythonStart = Python.init(pythonBasePath, rubiconBasePath, null)
         if (pythonStart > 0) {
             throw Exception("got an error initializing Python")
         }
     }
 
     private fun runPythonString(s: String) {
-        val fullFilename = applicationContext.dataDir!!.absolutePath + "/runme.py"
+        val fullFilename = "${pythonBasePath}/runme.py"
         val fos = FileOutputStream(fullFilename)
         fos.write(s.toByteArray())
         fos.close()
@@ -116,9 +120,9 @@ class MainActivity : AppCompatActivity() {
         captureStdoutStderr()
 
         unpackPython()
+        unpackRubicon()
         setPythonEnvVars()
         startPython()
-        unpackRubicon()
         runPythonString(
             // bring test_logging back soon
             """
@@ -127,7 +131,7 @@ class MainActivity : AppCompatActivity() {
             import random
             l = []
             random.shuffle(l)
-            sys.executable = os.environ.get("PYTHONHOME") + "/bin/python3"
+            sys.executable = sys.prefix + "/bin/python3"
             from test.libregrtest import main
             import ctypes
             import sys
