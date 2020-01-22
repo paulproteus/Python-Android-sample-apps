@@ -128,7 +128,12 @@ class MainActivity : AppCompatActivity() {
             import sys
             sys.executable = sys.prefix + "/bin/python3"
             from test.libregrtest import main
-            main([])
+            try:
+                main([])
+            except SystemExit as e:
+                # Do not let SystemExit bubble up further; if the app exits with a nonzero
+                # status code, Android restarts it, which is rather annoying. :)
+                print('Would exit with statuscode', e.code)
         """.trimIndent()
         )
         sample_text.text = "Hello from Kotlin!"
