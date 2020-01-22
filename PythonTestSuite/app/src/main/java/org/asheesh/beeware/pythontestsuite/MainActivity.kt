@@ -95,6 +95,11 @@ class MainActivity : AppCompatActivity() {
             pythonBasePath
         )
         Os.setenv("TMPDIR", applicationContext.cacheDir!!.absolutePath, true)
+        // Android needs LD_LIBRARY_PATH set in order for subprocesses to be able to use
+        // libraries from the app.
+        Os.setenv("LD_LIBRARY_PATH", applicationInfo.nativeLibraryDir, true)
+        // Any Python subprocesses are going to need PYTHONHOME configured.
+        Os.setenv("PYTHONHOME", pythonBasePath, true)
     }
 
     private fun startPython() {
