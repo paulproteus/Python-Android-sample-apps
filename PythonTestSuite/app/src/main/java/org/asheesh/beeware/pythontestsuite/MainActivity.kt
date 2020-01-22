@@ -124,18 +124,11 @@ class MainActivity : AppCompatActivity() {
         setPythonEnvVars()
         startPython()
         runPythonString(
-            // bring test_logging back soon
             """
             import sys
-            import os
-            import random
-            l = []
-            random.shuffle(l)
             sys.executable = sys.prefix + "/bin/python3"
             from test.libregrtest import main
-            import ctypes
-            import sys
-            main(l)
+            main([])
         """.trimIndent()
         )
 
