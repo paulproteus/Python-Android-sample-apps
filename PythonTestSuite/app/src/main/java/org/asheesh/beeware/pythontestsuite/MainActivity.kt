@@ -131,8 +131,8 @@ class MainActivity : AppCompatActivity() {
             main([])
         """.trimIndent()
         )
-
         sample_text.text = "Hello from Kotlin!"
+        finishAndRemoveTask()
     }
 
     /**
