@@ -5,6 +5,9 @@ set -eou pipefail
 APP="org.asheesh.beeware.pythontestsuite"
 MAIN_ACTIVITY="org.asheesh.beeware.pythontestsuite.MainActivity"
 
+# Tell bash to kill the logcat when this script exits.
+trap "trap - SIGTERM && kill -- -$$" SIGINT SIGTERM EXIT
+
 # Build and install the app on the most easily accessible Android device.
 ./gradlew installDebug
 
@@ -17,5 +20,5 @@ adb shell am force-stop "$APP"
 USER_ID="$(adb shell dumpsys package org.asheesh.beeware.pythontestsuite | grep userId | sed s,userId=,,)"
 adb shell am start "org.asheesh.beeware.pythontestsuite/org.asheesh.beeware.pythontestsuite.MainActivity" -a android.intent.action.MAIN -c android.intent.category.LAUNCHER
 
-# Foreground the logcat task.
-fg
+# Wait infinitely for logcat.
+sleep infinity
