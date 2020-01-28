@@ -9,27 +9,26 @@ import kotlinx.android.synthetic.main.activity_main.*
 import org.beeware.rubicon.Python
 import java.io.File
 import java.io.FileOutputStream
-import java.lang.RuntimeException
 import java.util.zip.ZipInputStream
 
 
 class MainActivity : AppCompatActivity() {
     private val pythonBasePath: String
-    get()  {
-        return pythonBaseDir.absolutePath
-    }
+        get() {
+            return pythonBaseDir.absolutePath
+        }
 
     private val pythonBaseDir: File
-    get() {
-        val dir = File(applicationContext.filesDir!!.absolutePath + "/python/")
-        if (!dir.exists()) {
-            val mkdirResult = dir.mkdirs()
-            if (!mkdirResult) {
-                throw Exception("Unable to find a place to store the Python stdlib.")
+        get() {
+            val dir = File(applicationContext.filesDir!!.absolutePath + "/python/")
+            if (!dir.exists()) {
+                val mkdirResult = dir.mkdirs()
+                if (!mkdirResult) {
+                    throw Exception("Unable to find a place to store the Python stdlib.")
+                }
             }
+            return dir
         }
-        return dir
-    }
 
     private fun unzipTo(inputStream: ZipInputStream, outputDir: File) {
         if (outputDir.exists()) {
@@ -70,19 +69,30 @@ class MainActivity : AppCompatActivity() {
         val myAbi = Build.SUPPORTED_ABIS[0];
         Log.e("unpackPython", "abi is ${myAbi}")
         unzipTo(ZipInputStream(assets.open("pythonhome.${myAbi}.zip")), pythonBaseDir)
-        val python = File("${pythonBaseDir}/bin/python3")
-        if (python.exists()) {
-            python.setExecutable(true)
-            python.setReadable(true)
+        fixFile(File("${pythonBaseDir}/bin/python3"))
+        fixFile(File("${pythonBaseDir}/bin/python3.7"))
+    }
+
+    private fun fixFile(executable: File) {
+        if (executable.exists()) {
+            executable.setExecutable(true)
+            executable.setReadable(true)
         } else {
             throw Error("yikes python is gone wtf")
         }
+        // See if magical restorecon saves the day
+        val pb =
+            ProcessBuilder("restorecon", executable.absolutePath)
+        println("Running restorecon...")
+        val process = pb.start()
+        val errCode = process.waitFor()
+        println("Restorecon finished. result=${errCode}")
     }
 
     private val rubiconBasePath: String
-    get() {
-        return "${pythonBasePath}/rubicon_install/"
-    }
+        get() {
+            return "${pythonBasePath}/rubicon_install/"
+        }
 
     private fun unpackRubicon() {
         unzipTo(ZipInputStream(assets.open("rubicon.zip")), File(rubiconBasePath))
@@ -131,7 +141,7 @@ class MainActivity : AppCompatActivity() {
         runPythonString(
             """
             import sys
-            sys.executable = sys.prefix + "/bin/python3"
+            sys.executable = sys.prefix + "/bin/python3.7"
             from test.libregrtest import main
             try:
                 main([])
