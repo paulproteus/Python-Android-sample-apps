@@ -16,9 +16,8 @@ adb shell logcat -c
 adb shell logcat &
 
 # Stop the app, then launch it.
-adb shell am force-stop "$APP"
-USER_ID="$(adb shell dumpsys package org.asheesh.beeware.pythontestsuite | grep userId | sed s,userId=,,)"
-adb shell am start "org.asheesh.beeware.pythontestsuite/org.asheesh.beeware.pythontestsuite.MainActivity" -a android.intent.action.MAIN -c android.intent.category.LAUNCHER
+adb shell am force-stop "$APP" || true
+adb shell am start "org.asheesh.beeware.pythontestsuite/org.asheesh.beeware.pythontestsuite.MainActivity" -a android.intent.action.MAIN -c android.intent.category.LAUNCHER || true
 
 # Wait infinitely for logcat.
-sleep infinity
+tail -f /dev/null
