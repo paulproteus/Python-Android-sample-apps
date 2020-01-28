@@ -1,14 +1,16 @@
 package org.asheesh.beeware.cplusplusstubsapp;
 
 import android.os.Bundle;
-import android.view.View;
 import android.widget.Button;
 import android.widget.LinearLayout;
 
 import androidx.appcompat.app.AppCompatActivity;
 
-public class MainActivity extends AppCompatActivity {
+interface Lambda {
+    void run();
+}
 
+public class MainActivity extends AppCompatActivity {
     // Used to load the 'native-lib' library on application startup.
     static {
         System.loadLibrary("native-lib");
@@ -18,19 +20,9 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         nativeLog("onCreate called");
-
         LinearLayout layout = new LinearLayout(this);
         setContentView(layout);
-        createButton();
         Button button = createButton();
-        // TODO: Move the next two expressions into C++.
-        button.setText("Button created from Java & C++ together");
-        button.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                ((Button) v).setText("Renamed the button from Java");
-            }
-        });
         layout.addView(button);
     }
 
