@@ -3,6 +3,7 @@ package org.asheesh.beeware.cplusplusstubsapp;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.os.Bundle;
+import android.view.View;
 import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -19,9 +20,16 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         LinearLayout layout = new LinearLayout(this);
         setContentView(layout);
-        // TODO: Move the next three lines into C++.
-        Button button = new Button(this);
-        button.setText("Button created from Java");
+        createButton();
+        Button button = createButton();
+        // TODO: Move the next two expressions into C++.
+        button.setText("Button created from Java & C++ together");
+        button.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                ((Button) v).setText(stringFromJNI());
+            }
+        });
         layout.addView(button);
     }
 
@@ -30,4 +38,5 @@ public class MainActivity extends AppCompatActivity {
      * which is packaged with this application.
      */
     public native String stringFromJNI();
+    private native Button createButton();
 }
