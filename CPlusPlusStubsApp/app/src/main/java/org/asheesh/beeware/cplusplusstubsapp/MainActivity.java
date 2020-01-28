@@ -1,12 +1,11 @@
 package org.asheesh.beeware.cplusplusstubsapp;
 
-import androidx.appcompat.app.AppCompatActivity;
-
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
 import android.widget.LinearLayout;
-import android.widget.TextView;
+
+import androidx.appcompat.app.AppCompatActivity;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -18,6 +17,8 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        nativeLog("onCreate called");
+
         LinearLayout layout = new LinearLayout(this);
         setContentView(layout);
         createButton();
@@ -27,16 +28,37 @@ public class MainActivity extends AppCompatActivity {
         button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                ((Button) v).setText(stringFromJNI());
+                ((Button) v).setText("Renamed the button from Java");
             }
         });
         layout.addView(button);
     }
 
-    /**
-     * A native method that is implemented by the 'native-lib' native library,
-     * which is packaged with this application.
-     */
-    public native String stringFromJNI();
+    @Override
+    protected void onStart() {
+        super.onStart();
+        nativeLog("onStart called");
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        nativeLog("onResume called");
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        nativeLog("onPause called");
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        nativeLog("onDestroy called");
+    }
+
     private native Button createButton();
+
+    private native void nativeLog(String msg);
 }
