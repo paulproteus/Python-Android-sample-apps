@@ -1,4 +1,4 @@
-package org.asheesh.beeware.cplusplusstubsapp;
+package org.asheesh.beeware.pythonstubsapp;
 
 import android.content.Context;
 
@@ -22,6 +22,6 @@ public class ExampleInstrumentedTest {
         // Context of the app under test.
         Context appContext = InstrumentationRegistry.getInstrumentation().getTargetContext();
 
-        assertEquals("org.asheesh.beeware.cplusplusstubsapp", appContext.getPackageName());
+        assertEquals("org.asheesh.beeware.pythonstubsapp", appContext.getPackageName());
     }
 }

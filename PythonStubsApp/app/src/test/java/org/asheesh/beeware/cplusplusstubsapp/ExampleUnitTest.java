@@ -1,4 +1,4 @@
-package org.asheesh.beeware.cplusplusstubsapp;
+package org.asheesh.beeware.pythonstubsapp;
 
 import org.junit.Test;
 

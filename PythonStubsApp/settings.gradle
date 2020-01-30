@@ -1,2 +1,2 @@
 include ':app'
-rootProject.name='C++ StubsApp'
+rootProject.name='Python StubsApp'

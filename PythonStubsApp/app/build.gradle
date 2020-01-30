@@ -4,7 +4,7 @@ android {
     compileSdkVersion 29
     buildToolsVersion "29.0.2"
     defaultConfig {
-        applicationId "org.asheesh.beeware.cplusplusstubsapp"
+        applicationId "org.asheesh.beeware.pythonstubsapp"
         minSdkVersion 21
         targetSdkVersion 29
         versionCode 1

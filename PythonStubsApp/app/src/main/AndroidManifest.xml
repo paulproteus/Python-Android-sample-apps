@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="org.asheesh.beeware.cplusplusstubsapp">
+    package="org.asheesh.beeware.pythonstubsapp">
 
     <application
         android:allowBackup="true"

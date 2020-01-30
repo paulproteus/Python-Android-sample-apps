@@ -2,7 +2,7 @@
 #include <string>
 
 extern "C" JNIEXPORT jobject JNICALL
-Java_org_asheesh_beeware_cplusplusstubsapp_MainActivity_createButton(
+Java_org_asheesh_beeware_pythonstubsapp_MainActivity_createButton(
         JNIEnv *env,
         jobject thisObj) {
     jclass buttonClass = env->FindClass("android/widget/Button");
@@ -13,7 +13,7 @@ Java_org_asheesh_beeware_cplusplusstubsapp_MainActivity_createButton(
 }
 
 extern "C" JNIEXPORT jstring JNICALL
-Java_org_asheesh_beeware_cplusplusstubsapp_MainActivity_stringFromJNI(
+Java_org_asheesh_beeware_pythonstubsapp_MainActivity_stringFromJNI(
         JNIEnv *env,
         jobject /* this */) {
     std::string hello = "Hello from C++";
