@@ -5,6 +5,19 @@ set -eou pipefail
 APP="org.asheesh.beeware.pythontestsuite"
 MAIN_ACTIVITY="org.asheesh.beeware.pythontestsuite.MainActivity"
 
+if [ -z "${ANDROID_SDK_ROOT:-}" ] ; then
+    echo 'You must install the Android SDK and configure ANDROID_SDK_ROOT to point to it. Aborting.'
+    exit 1
+fi
+
+if [ ! -d "$ANDROID_SDK_ROOT" ] ; then
+    echo "ANDROID_SDK_ROOT=$ANDROID_SDK_ROOT is not a directory. Aborting."
+    exit 1
+fi
+
+# Add things like adb to the path for this script, but not children.
+PATH="$PATH:$ANDROID_SDK_ROOT/platform-tools"
+
 # Tell bash to kill the logcat when this script exits.
 trap "trap - SIGTERM && kill -- -$$" SIGINT SIGTERM EXIT
 
