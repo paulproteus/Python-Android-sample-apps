@@ -144,7 +144,7 @@ class MainActivity : AppCompatActivity() {
             sys.executable = sys.prefix + "/bin/python3.7"
             from test.libregrtest import main
             try:
-                main([])
+                main([], use_resources=['network'])
             except SystemExit as e:
                 # Do not let SystemExit bubble up further; if the app exits with a nonzero
                 # status code, Android restarts it, which is rather annoying. :)
