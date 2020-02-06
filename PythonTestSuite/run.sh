@@ -23,9 +23,9 @@ trap "trap - SIGTERM && kill -- -$$" SIGINT SIGTERM EXIT
 
 ./gradlew installDebug
 
-# Clear and then watch the log.
-adb shell logcat -c
-adb shell logcat &
+# Clear the the log, then watch the `stdio` log, and `S`ilence everything else.
+adb shell logcat -c &
+adb shell logcat "stdio:*" "*:S" &
 
 # Stop the app, then launch it.
 adb shell am force-stop "$APP" || true
