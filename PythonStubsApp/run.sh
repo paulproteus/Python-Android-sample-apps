@@ -21,6 +21,9 @@ PATH="$PATH:$ANDROID_SDK_ROOT/platform-tools"
 # Tell bash to kill the logcat when this script exits.
 trap "trap - SIGTERM && kill -- -$$" SIGINT SIGTERM EXIT
 
+# Package up the user code so that the app can unpack it.
+cd app/pythonsrc && zip -0 --quiet -r ../../app/src/main/assets/user-code.zip . && cd ../..
+
 ./gradlew installDebug --stacktrace
 
 # Clear the the log, then watch the `stdio` log, and `S`ilence everything else.

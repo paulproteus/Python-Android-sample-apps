@@ -110,6 +110,7 @@ public class MainActivity extends AppCompatActivity implements ISetPythonApp {
         String myAbi = Build.SUPPORTED_ABIS[0];
         Log.e("unpackPython", "abi is " + myAbi);
         this.unzipTo(new ZipInputStream(this.getAssets().open("pythonhome." + myAbi + ".zip")), this.getPythonBaseDir());
+        this.unzipTo(new ZipInputStream(this.getAssets().open("user-code.zip")), getUserCodeDir());
         this.fixFile(new File(this.getPythonBaseDir() + "/bin/python3"));
         this.fixFile(new File(this.getPythonBaseDir() + "/bin/python3.7"));
     }
@@ -155,11 +156,34 @@ public class MainActivity extends AppCompatActivity implements ISetPythonApp {
         Os.setenv("PYTHONHOME", this.getPythonBasePath(), true);
     }
 
+    private File getUserCodeDir() throws Exception {
+        StringBuilder var10002 = new StringBuilder();
+        Context var10003 = this.getApplicationContext();
+        Intrinsics.checkExpressionValueIsNotNull(var10003, "applicationContext");
+        File var3 = var10003.getFilesDir();
+        if (var3 == null) {
+            Intrinsics.throwNpe();
+        }
+
+        File dir = new File(var10002.append(var3.getAbsolutePath()).append("/user-code/").toString());
+        if (!dir.exists()) {
+            boolean mkdirResult = dir.mkdirs();
+            if (!mkdirResult) {
+                throw new Exception("Unable to find a place to store the user's code.");
+            }
+        }
+
+        return dir;
+
+    }
+
     private final void startPython() throws Throwable {
         this.setPythonEnvVars();
         this.unpackPython();
         this.unpackRubicon();
-        int pythonStart = Python.init(this.getPythonBasePath(), this.getRubiconBasePath(), (String) null);
+        int pythonStart = Python.init(this.getPythonBasePath(),
+                this.getRubiconBasePath() + ":" + this.getUserCodeDir().getAbsolutePath(),
+                (String) null);
         if (pythonStart > 0) {
             throw (Throwable) (new Exception("got an error initializing Python"));
         }
@@ -190,7 +214,7 @@ public class MainActivity extends AppCompatActivity implements ISetPythonApp {
     private final void extractPythonApp() throws Throwable {
         Os.setenv("ACTIVITY_NAME", "org.asheesh.beeware.pythonstubsapp.MainActivity", true);
         Os.setenv("SET_PYTHON_APP_INTERFACE_NAME", "org.asheesh.beeware.pythonstubsapp.ISetPythonApp", true);
-        this.runPythonString("import app.__main__");
+        this.runPythonString("import sys; print(sys.path); import os; print(os.environ); import app.__main__");
         Os.setenv("ACTIVITY_NAME", "", true);
         Os.setenv("ACTIVITY_SETPYTHONAPP_INTERFACE", "", true);
     }
