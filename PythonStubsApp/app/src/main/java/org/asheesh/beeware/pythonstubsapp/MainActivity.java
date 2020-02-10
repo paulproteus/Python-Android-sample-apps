@@ -18,25 +18,14 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        captureStdoutStderr();
         LinearLayout layout = new LinearLayout(this);
         setContentView(layout);
-        createButton();
-        Button button = createButton();
-        // TODO: Move the next two expressions into C++.
-        button.setText("Button created from Java & C++ together");
-        button.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                ((Button) v).setText(stringFromJNI());
-            }
-        });
-        layout.addView(button);
     }
 
     /**
      * A native method that is implemented by the 'native-lib' native library,
      * which is packaged with this application.
      */
-    public native String stringFromJNI();
-    private native Button createButton();
+    private native boolean captureStdoutStderr();
 }
