@@ -30,6 +30,11 @@ android {
             version "3.6.0+"
         }
     }
+    sourceSets {
+        main {
+            jniLibs.srcDirs = ['libs']
+        }
+    }
 }
 
 dependencies {
