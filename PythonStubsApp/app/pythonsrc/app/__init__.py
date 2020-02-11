@@ -7,6 +7,8 @@ import urllib.request
 import socket
 import ssl
 
+from rubicon.java import JavaInterface
+
 
 def print_int_list():
     l = [random.randint(0, 99) for i in range(5)]
@@ -52,8 +54,9 @@ def do_everything():
     print_int_list()
     print_beeware_members(context)
 
+IPythonApp = JavaInterface("org/asheesh/beeware/pythonstubsapp/IPythonApp")
 
-class Application:
+class Application(IPythonApp):
     def onCreate(self):
         print("onCreate called")
         print_int_list()

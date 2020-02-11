@@ -26,11 +26,10 @@ import kotlin.jvm.internal.Ref.IntRef;
 import kotlin.text.Charsets;
 
 import org.beeware.rubicon.Python;
-import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-public class MainActivity extends AppCompatActivity implements ISetPythonApp {
-    private IPythonApp pythonApp;
+public class MainActivity extends AppCompatActivity {
+    private static IPythonApp pythonApp;
 
     private String getPythonBasePath() throws Throwable {
         return this.getPythonBaseDir().getAbsolutePath();
@@ -154,6 +153,7 @@ public class MainActivity extends AppCompatActivity implements ISetPythonApp {
         Os.setenv("TMPDIR", var1.getAbsolutePath(), true);
         Os.setenv("LD_LIBRARY_PATH", this.getApplicationInfo().nativeLibraryDir, true);
         Os.setenv("PYTHONHOME", this.getPythonBasePath(), true);
+        Os.setenv("ACTIVITY_CLASS_NAME", "org/asheesh/beeware/pythonstubsapp/MainActivity", true);
     }
 
     private File getUserCodeDir() throws Exception {
@@ -206,17 +206,16 @@ public class MainActivity extends AppCompatActivity implements ISetPythonApp {
         }
     }
 
-    public void setPythonApp(@NotNull IPythonApp app) {
-        Intrinsics.checkParameterIsNotNull(app, "app");
-        this.pythonApp = app;
+    public static int exampleStaticMethod() {
+        return 3;
+    }
+
+    public static void setPythonApp(IPythonApp app) {
+        pythonApp = app;
     }
 
     private final void extractPythonApp() throws Throwable {
-        Os.setenv("ACTIVITY_NAME", "org.asheesh.beeware.pythonstubsapp.MainActivity", true);
-        Os.setenv("SET_PYTHON_APP_INTERFACE_NAME", "org.asheesh.beeware.pythonstubsapp.ISetPythonApp", true);
         this.runPythonString("import sys; print(sys.path); import os; print(os.environ); import app.__main__");
-        Os.setenv("ACTIVITY_NAME", "", true);
-        Os.setenv("ACTIVITY_SETPYTHONAPP_INTERFACE", "", true);
     }
 
     protected void onCreate(@Nullable Bundle savedInstanceState) {
