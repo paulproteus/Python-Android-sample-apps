@@ -7,7 +7,7 @@ import urllib.request
 import socket
 import ssl
 
-from rubicon.java import JavaInterface
+from rubicon.java import JavaClass, JavaInterface
 
 
 def print_int_list():
@@ -64,19 +64,36 @@ def do_everything():
 
 IPythonApp = JavaInterface("org/asheesh/beeware/pythonstubsapp/IPythonApp")
 
+Button = JavaClass("android/widget/Button")
+LinearLayout = JavaClass("android/widget/LinearLayout")
+
 class Application(IPythonApp):
+    #def __init__(self, java_activity_instance):
+    #    super()
+    #    # We need the Java activity from Android so we can pass a
+    #    # `context` to UI elements, e.g., `Button`.
+    #    self.java_activity_instance = java_activity_instance
+
     def onCreate(self):
         print("called Python onCreate method")
 
     def onStart(self):
         print("called Python onStart method")
+        self.make_button()
         do_everything()
 
     def onResume(self):
         print("called Python onResume method")
 
     def make_button(self):
-        pass
+        activity_class_name = os.environ['ACTIVITY_CLASS_NAME']
+        activity_class = JavaClass(activity_class_name)
+        java_activity_instance = activity_class.singletonThis
+        linear_layout = LinearLayout(java_activity_instance)
+        java_activity_instance.setContentView(linear_layout)
+        button = Button(java_activity_instance)
+        button.setText("Python made this button! Click Me")
+        linear_layout.addView(button)
 
     def add_button_onclick(self, button):
         # TODO: Add this to the onclick.
