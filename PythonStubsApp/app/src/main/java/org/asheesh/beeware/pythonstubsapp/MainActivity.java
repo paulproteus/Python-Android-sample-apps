@@ -6,7 +6,6 @@ import android.os.Bundle;
 import android.system.ErrnoException;
 import android.system.Os;
 import android.util.Log;
-import android.view.View;
 import android.widget.LinearLayout;
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -15,8 +14,6 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.zip.ZipInputStream;
-
-import kotlin.text.Charsets;
 
 import org.beeware.rubicon.Python;
 import org.jetbrains.annotations.Nullable;
@@ -39,6 +36,10 @@ public class MainActivity extends AppCompatActivity {
         pythonApp = app;
     }
 
+    /**
+     * We store the MainActivity instance on the *class* so that we can easily access it from Python.
+     */
+    public static MainActivity singletonThis;
 
     private File ensureDir(File dir) throws IOException {
         if (dir.exists()) {
@@ -97,10 +98,9 @@ public class MainActivity extends AppCompatActivity {
                 null) != 0) {
             throw new Exception("Unable to start Python interpreter.");
         }
-    }
-
-    private void extractPythonApp() throws IOException {
-        String fullFilename = this.getPythonBasePath() + "/runme.py";
+        // Store the code in a file because Python.run() takes a filename.
+        // We can't run app/__main__.py directly because it uses package-relative imports.
+        String fullFilename = this.getPythonBasePath() + "/start_app.py";
         FileOutputStream fos = new FileOutputStream(fullFilename);
         fos.write("import app.__main__".getBytes());
         fos.close();
@@ -112,9 +112,9 @@ public class MainActivity extends AppCompatActivity {
         this.captureStdoutStderr();
         LinearLayout layout = new LinearLayout(this);
         this.setContentView(layout);
+        singletonThis = this;
         try {
             this.startPython();
-            this.extractPythonApp();
         } catch (Exception e) {
             System.err.println("Failed to create Python app.");
             System.err.println(e);
