@@ -12,21 +12,29 @@ from rubicon.java import JavaInterface
 
 def print_int_list():
     l = [random.randint(0, 99) for i in range(5)]
-    print("random integers from 0 to 99 (inclusive)", l)
+    print("random integers from 0 to 99 (inclusive)")
+    print(">>> [random.randint(0, 99) for i in range(5)]")
+    print(l)
 
 
 def print_beeware_members(context):
     response = urllib.request.urlopen("https://api.github.com/orgs/beeware/members", context=context)
     body = response.read()
     parsed = json.loads(body)
+    print(">>> parsed = json.loads(urllib.request.urlopen(...).read())")
+    print(">>> [item['login'] for item in parsed]")
     print([item["login"] for item in parsed])
 
 
 def print_now():
     now = datetime.datetime.now()
-    print("Current time in current time zone", now.isoformat())
+    print("Current time in current time zone")
+    print(">>> datetime.datetime.now().isoformat()")
+    print(now.isoformat())
     utcnow = datetime.datetime.utcnow()
-    print("Current time in UTC", utcnow.isoformat())
+    print("Current time in UTC")
+    print(">>> datetime.datetime.utcnow().isoformat()")
+    print(utcnow.isoformat())
 
 def make_ssl_context():
     if os.path.exists('/etc/security/cacerts'):
@@ -58,14 +66,14 @@ IPythonApp = JavaInterface("org/asheesh/beeware/pythonstubsapp/IPythonApp")
 
 class Application(IPythonApp):
     def onCreate(self):
-        print("onCreate called")
-        print_int_list()
+        print("called Python onCreate method")
 
     def onStart(self):
-        print("onStart called")
+        print("called Python onStart method")
+        do_everything()
 
     def onResume(self):
-        print("onResume called")
+        print("called Python onResume method")
 
     def make_button(self):
         pass

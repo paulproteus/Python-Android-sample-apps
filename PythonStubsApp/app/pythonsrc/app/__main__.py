@@ -8,8 +8,5 @@ print("app launched", app, file=sys.stderr)
 
 activity_class_name = os.environ['ACTIVITY_CLASS_NAME']
 activity_class = JavaClass(activity_class_name)
-print(activity_class.exampleStaticMethod())
 activity_class.setPythonApp(app)
-
-print("Stored app in Java field")
-do_everything()
+print("Successfully stored reference to Python app in Java field")

@@ -206,16 +206,12 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    public static int exampleStaticMethod() {
-        return 3;
-    }
-
     public static void setPythonApp(IPythonApp app) {
         pythonApp = app;
     }
 
     private final void extractPythonApp() throws Throwable {
-        this.runPythonString("import sys; print(sys.path); import os; print(os.environ); import app.__main__");
+        this.runPythonString("import app.__main__");
     }
 
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -229,6 +225,17 @@ public class MainActivity extends AppCompatActivity {
         } catch (Throwable e) {
             System.err.println(e);
         }
+        pythonApp.onCreate();
+    }
+
+    protected void onStart() {
+        super.onStart();
+        pythonApp.onStart();
+    }
+
+    protected void onResume() {
+        super.onResume();
+        pythonApp.onResume();
     }
 
     private native boolean captureStdoutStderr();
