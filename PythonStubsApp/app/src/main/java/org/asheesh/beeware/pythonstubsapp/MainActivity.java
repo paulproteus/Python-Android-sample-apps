@@ -19,6 +19,7 @@ import org.beeware.rubicon.Python;
 import org.jetbrains.annotations.Nullable;
 
 import static org.asheesh.beeware.pythonstubsapp.HelpersKt.makeExecutable;
+import static org.asheesh.beeware.pythonstubsapp.HelpersKt.unpackAssetPrefix;
 import static org.asheesh.beeware.pythonstubsapp.HelpersKt.unzipTo;
 
 public class MainActivity extends AppCompatActivity {
@@ -74,7 +75,7 @@ public class MainActivity extends AppCompatActivity {
         Log.e("unpackPython", "abi is " + myAbi);
         unzipTo(new ZipInputStream(this.getAssets().open("pythonhome." + myAbi + ".zip")), this.getPythonBaseDir());
         unzipTo(new ZipInputStream(this.getAssets().open("rubicon.zip")), getRubiconJavaInstallDir());
-        unzipTo(new ZipInputStream(this.getAssets().open("user-code.zip")), getUserCodeDir());
+        unpackAssetPrefix(getAssets(), "python-src", getUserCodeDir());
         makeExecutable(new File(this.getPythonBaseDir() + "/bin/python3"));
         makeExecutable(new File(this.getPythonBaseDir() + "/bin/python3.7"));
     }
@@ -116,8 +117,7 @@ public class MainActivity extends AppCompatActivity {
         try {
             this.startPython();
         } catch (Exception e) {
-            System.err.println("Failed to create Python app.");
-            System.err.println(e);
+            Log.e("MainActivity", "Failed to create Python app", e);
             return;
         }
         pythonApp.onCreate();
