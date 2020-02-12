@@ -48,7 +48,7 @@ private fun ensureDir(dir: File) {
 }
 
 private fun copy(source: InputStream, targetPath: File) {
-    ensureDir(targetPath.parentFile)
+    ensureDir(targetPath.parentFile!!)
     val buffer = ByteArray(4096 * 64)
     var len: Int = source.read(buffer)
     val target = FileOutputStream(targetPath)

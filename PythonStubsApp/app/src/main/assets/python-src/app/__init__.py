@@ -56,16 +56,22 @@ def make_ssl_context():
         return context
     return ssl.create_default_context()
 
-def do_everything():
+def run_demo_code():
     context = make_ssl_context()
     print_now()
     print_int_list()
     print_beeware_members(context)
 
+OnClickListener = JavaInterface("android/view/View$OnClickListener")
 IPythonApp = JavaInterface("org/asheesh/beeware/pythonstubsapp/IPythonApp")
 
 Button = JavaClass("android/widget/Button")
 LinearLayout = JavaClass("android/widget/LinearLayout")
+
+class OnClickRunDemoCode(OnClickListener):
+    def onClick(self, _view):
+        run_demo_code()
+
 
 class Application(IPythonApp):
     #def __init__(self, java_activity_instance):
@@ -80,7 +86,6 @@ class Application(IPythonApp):
     def onStart(self):
         print("called Python onStart method")
         self.make_button()
-        do_everything()
 
     def onResume(self):
         print("called Python onResume method")
@@ -89,12 +94,10 @@ class Application(IPythonApp):
         activity_class_name = os.environ['ACTIVITY_CLASS_NAME']
         activity_class = JavaClass(activity_class_name)
         java_activity_instance = activity_class.singletonThis
+
         linear_layout = LinearLayout(java_activity_instance)
         java_activity_instance.setContentView(linear_layout)
         button = Button(java_activity_instance)
         button.setText("Python made this button! Click Me")
+        button.setOnClickListener(OnClickRunDemoCode())
         linear_layout.addView(button)
-
-    def add_button_onclick(self, button):
-        # TODO: Add this to the onclick.
-        print_beeware_members()
