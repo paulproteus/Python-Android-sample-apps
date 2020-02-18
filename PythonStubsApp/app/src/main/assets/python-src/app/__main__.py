@@ -1,7 +1,7 @@
 import os
 import sys
 from rubicon.java import JavaClass
-from . import Application, do_everything
+from . import Application
 
 activity_class_name = os.environ['ACTIVITY_CLASS_NAME']
 activity_class = JavaClass(activity_class_name)
